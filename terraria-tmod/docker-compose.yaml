@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-# --- Main TMOD Server, be sure to read parent image README, I'm not the source of how this image works
+# --- Main TMOD Server, be sure to read parent image README for details/features/usage
     tmod:
         #image: 'rfvgyhn/tmodloader:latest'
         # Building latest tmod version from PR fork/custom Dockerfile tweaks
@@ -9,7 +9,7 @@ services:
             context: .
         container_name: 'tmod'
         ports:
-            - 7777
+            - 7777:7777
         volumes:
             - /etc/localtime:/etc/localtime:ro
             - ./data:/terraria
@@ -25,7 +25,7 @@ services:
             - /etc/ssh/
             - ./enable-root-ssh:/etc/sftp.d/enable-root-ssh
         ports:
-            - 22
+            - 2277:22
         environment:
             - SFTP_USERS  # .env but not used
             - SFTP_PASS   # .env used to setup root in enable-root-ssh
