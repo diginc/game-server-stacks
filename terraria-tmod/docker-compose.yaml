@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+# --- Main TMOD Server, be sure to read parent image README for details/features/usage
+    tmod:
+        #image: 'rfvgyhn/tmodloader:latest'
+        # Building latest tmod version from PR fork/custom Dockerfile tweaks
+        build:
+            context: .
+        container_name: 'tmod'
+        ports:
+            - 7777:7777
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - ./data:/terraria
+            - ./config.txt:/terraria-server/config.txt
+        environment:
+            - TMOD_SHUTDOWN_MSG="See ya!"
+# --- SFTP for manually managing mods/resources
+    sftp:
+        image: atmoz/sftp
+        volumes:
+            - ./data:/root/data
+            - ./config.txt:/root/config.txt
+            - /etc/ssh/
+            - ./enable-root-ssh:/etc/sftp.d/enable-root-ssh
+        ports:
+            - 2277:22
+        environment:
+            - SFTP_USERS  # .env but not used
+            - SFTP_PASS   # .env used to setup root in enable-root-ssh
+# --- Custom notification scripts to let discord friends know when servers up or down
+    discord-notify:
+        image: curlimages/curl
+        environment:
+          - WEBHOOK_URL
+          - DISCORD_USER
+          - MSG=Test Message
+        volumes:
+            - ./notify.sh:/usr/local/bin/notify.sh
+        entrypoint: /usr/local/bin/notify.sh
+# ---
